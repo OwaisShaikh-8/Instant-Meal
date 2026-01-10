@@ -1,58 +1,68 @@
-import { 
-  useLoginMutation, 
-  useLogoutMutation, 
-  useSignupMutation 
+import {
+  useLoginMutation,
+  useLogoutMutation,
+  useSignupMutation
 } from "../services/auth-api.js"; // ✅ Import hooks directly
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useCallback } from "react";
 
 const useAuth = () => {
   const navigate = useNavigate();
 
-  // ✅ Use hooks directly (no destructuring from authApi)
-  const [login, { 
-    isLoading: isLoginLoading, 
-    isError: isLoginError, 
-    error: loginError 
+  const loggedInUser = useSelector((state) => state.auth.user);
+  const hasRoles = useSelector((state) => state.auth.hasRoles);
+
+  const [login, {
+    isLoading: isLoginLoading,
+    isError: isLoginError,
+    error: loginError
   }] = useLoginMutation();
 
-  const [signup, { 
-    isLoading: isSignupLoading, 
-    isError: isSignupError, 
-    error: signupError 
+  const [signup, {
+    isLoading: isSignupLoading,
+    isError: isSignupError,
+    error: signupError
   }] = useSignupMutation();
 
-  const [logout, { 
-    isLoading: isLogoutLoading, 
-    isError: isLogoutError, 
-    error: logoutError 
+  const [logout, {
+    isLoading: isLogoutLoading,
+    isError: isLogoutError,
+    error: logoutError
   }] = useLogoutMutation();
 
   // 🔐 Login
-  const loginUser = async (data) => {
+  const loginUser = useCallback(async (data) => {
     try {
       const response = await login(data).unwrap();
-      console.log(data);
-      
+
       // ✅ Store in localStorage (backup for page refresh)
       localStorage.setItem("instantmeal", JSON.stringify(response));
 
       // ✅ Navigate based on role
-      const targetRoute = response.user.role === "vendor" 
-        ? "/vendorhome" 
-        : "/customerhome";
-      
+      let targetRoute = "";
+
+      if (response.user.role === "vendor") {
+        if (response.hasRoles) {
+          targetRoute = "/vendorhome"; // roles not set
+        } else {
+          targetRoute = "/admindashboard"; // roles are set
+        }
+      } else {
+        targetRoute = "/customerhome"; // customer flow
+      }
+
       navigate(targetRoute);
 
       return response;
-    } catch (error) {
-      // ✅ Error already handled by axios interceptor (alert shown)
-      // Just re-throw so caller knows it failed
-      // throw error;
+    } catch{
+      // ✅ Error already handled by axios interceptor
+
     }
-  };
+  }, [login, navigate]);
 
   // 📝 Signup
-  const signupUser = async (data) => {
+  const signupUser = useCallback(async (data) => {
     try {
       const response = await signup(data).unwrap();
 
@@ -60,38 +70,40 @@ const useAuth = () => {
       localStorage.setItem("instantmeal", JSON.stringify(response));
 
       // ✅ Navigate based on role
-      const targetRoute = response.user.role === "vendor" 
-        ? "/vendorhome" 
+      const targetRoute = response.user.role === "vendor"
+        ? "/vendorhome"
         : "/customerhome";
-      
+
       navigate(targetRoute);
 
       return response;
-    } catch (error) {
+    } catch  {
       // ✅ Error already handled by axios interceptor
-      // throw error;
     }
-  };
+  }, [signup, navigate]);
 
   // 🚪 Logout
-  const logoutUser = async () => {
+  const logoutUser = useCallback(async () => {
     try {
       await logout().unwrap();
-      
+
       // ✅ Clear localStorage
       localStorage.removeItem("instantmeal");
-      
+
       // ✅ Navigate to home
       navigate("/", { replace: true });
-    } catch (error) {
+    } catch{
       // ✅ Even if API fails, clear local data (good UX)
       localStorage.removeItem("instantmeal");
       navigate("/", { replace: true });
     }
-  };
+  }, [logout, navigate]);
+ 
+  
 
   return {
-    // actions
+    loggedInUser,
+    hasRoles,
     loginUser,
     signupUser,
     logoutUser,

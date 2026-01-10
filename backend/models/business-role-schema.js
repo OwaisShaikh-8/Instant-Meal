@@ -1,32 +1,32 @@
 import mongoose from "mongoose";
 
-const  BusinessRoleSchema = new mongoose.Schema({
+const BusinessRoleSchema = new mongoose.Schema({
   user: {
     type: mongoose.Types.ObjectId,
-    ref: "User", // or "Vendor"
+    ref: "User",
     required: true,
-    unique: true, // ensure one document per user/vendor
+    unique: true,
   },
   roles: {
     admin: {
-      secretKey: { type: String, default: "", required: true },
-      isSet: { type: Boolean, default: false }, // admin is always set
-      index: true,
+      personName: { type: String, default: "" },
+      secretKey: { type: String, default: "" },
+      isSet: { type: Boolean, default: false },
     },
     manager: {
+      personName: { type: String, default: "" },
       secretKey: { type: String, default: "" },
       isSet: { type: Boolean, default: false },
-      index: true,
     },
     chef: {
+      personName: { type: String, default: "" },
       secretKey: { type: String, default: "" },
       isSet: { type: Boolean, default: false },
-      index: true,
     },
     deliveryPartner: {
+      personName: { type: String, default: "" },
       secretKey: { type: String, default: "" },
       isSet: { type: Boolean, default: false },
-      index: true,
     },
   },
   createdAt: {
@@ -35,13 +35,26 @@ const  BusinessRoleSchema = new mongoose.Schema({
   },
 });
 
-// Optional: Compound index if you query by multiple roles frequently
-RestaurantAdminSchema.index(
-  { "roles.admin.secretKey": 1, "roles.manager.secretKey": 1 },
-  { name: "roles_admin_manager_index" }
-);
+/* ✅ PASTE MIDDLEWARE HERE */
+BusinessRoleSchema.pre("save", function (next) {
+  const roles = this.roles;
 
-export const BusinessRole = mongoose.model(
-  "BusinessRole",
-  BusinessRoleSchema
-);
+  Object.keys(roles).forEach((role) => {
+    const { personName, secretKey } = roles[role];
+
+    roles[role].isSet =
+      Boolean(personName && personName.trim()) ||
+      Boolean(secretKey && secretKey.trim());
+  });
+
+  next();
+});
+
+/* (Optional) indexes */
+BusinessRoleSchema.index({ "roles.admin.secretKey": 1 });
+BusinessRoleSchema.index({ "roles.manager.secretKey": 1 });
+
+/* ✅ Model creation MUST be last */
+const BusinessRole = mongoose.model("BusinessRole", BusinessRoleSchema);
+
+export default BusinessRole;

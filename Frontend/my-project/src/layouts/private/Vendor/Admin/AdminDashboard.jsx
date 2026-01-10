@@ -4,10 +4,11 @@ import { Outlet } from "react-router-dom";
 import Avatar from "react-avatar";
 import Dashmain from "./Dashmain";
 import ManageRoles from "./ManageRoles";
-// import { useLocation } from "react-router-dom";
+import useAuth from "../../../../hooks/use-auth.js";
 const AdminDashboard = () => {
-  // const pathname = useLocation();
 
+
+  const { hasRoles } = useAuth();
   return (
     <div className="flex">
       <div className="p-[20px] bg-[#1C1C1C] flex lg:hidden justify-between absolute top-0 right-0 left-0">
@@ -93,7 +94,10 @@ const AdminDashboard = () => {
               Settings
             </li>
           </ul>
-          <ul className="flex flex-col gap-[10px] mt-[51px]">
+
+          {
+            hasRoles &&
+                          <ul className="flex flex-col gap-[10px] mt-[51px]">
             <li className="text-[12px] leading-[100%] tracking-[0%] uppercase text-[#9B9B9B]">
               Pricing
             </li>
@@ -147,6 +151,9 @@ const AdminDashboard = () => {
                 Sales
             </li>
           </ul>
+
+          }
+          
         </div>
       </div>
       <div className="p-[30px] pt-[100px] lg:pt-[30px]  w-full bg-[#f9f9f9]">

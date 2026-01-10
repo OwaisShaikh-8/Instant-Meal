@@ -14,7 +14,7 @@ import AdminDashboard from "./layouts/private/Vendor/Admin/AdminDashboard.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: <LandingPage/>,
   },
   {
     path: "/vendorhome",
@@ -24,6 +24,15 @@ const router = createBrowserRouter([
     path: "/customerhome",
     element: <CustomerHome />,
   },
+  {
+    path:"/admindashboard",
+    element:<AdminDashboard/>
+  }
+
+
+
+
+
 ]);
 
 function App() {

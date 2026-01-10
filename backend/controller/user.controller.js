@@ -1,4 +1,6 @@
 import User from "../models/user.model.js";
+import  BusinessRole  from "../models/business-role-schema.js";
+
 import bcrypt from "bcryptjs";
 import createTokenAndSaveCookie from "../jwt/generateToken.js";
 
@@ -196,40 +198,35 @@ export const registerVendor = async (req, res) => {
 // ===================================
 // 🔐 LOGIN
 // ===================================
+
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // ✅ Validate required fields
     if (!email || !password) {
-      return res.status(400).json({ 
-        error: "Email and password are required" 
-      });
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
-    // ✅ Find user by email (case-insensitive)
+    // Find user
     const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
-    // ✅ Check if user exists BEFORE comparing password
-    if (!user) {
-      return res.status(401).json({ 
-        error: "Invalid credentials" 
-      });
-    }
-
-    // ✅ Compare password
+    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
-    if (!isMatch) {
-      return res.status(401).json({ 
-        error: "Invalid credentials" 
-      });
-    }
-
-    // ✅ Generate token and set cookie
+    // Generate token
     const token = createTokenAndSaveCookie(user._id, res);
 
-    // ✅ Return success with user data (NO password!)
+    // Only for vendor: check if any roles are set
+    let hasRoles = null;
+    if (user.role === "vendor") {
+      const businessRole = await BusinessRole.findOne({ user: user._id });
+      hasRoles = businessRole ? true : false;
+    }
+
+    // Send response
     res.status(200).json({
       message: "Login successful",
       token,
@@ -240,15 +237,22 @@ export const login = async (req, res) => {
         role: user.role,
         ...(user.companyName && { companyName: user.companyName }),
       },
+      ...(hasRoles !== null && { hasRoles }), // only for vendor
     });
 
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({ 
-      error: "Internal server error" 
-    });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+
+
+
+
+
+
 
 // ===================================
 // 🚪 LOGOUT

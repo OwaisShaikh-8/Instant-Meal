@@ -3,6 +3,7 @@ import cors from 'cors'
 import mongoose from 'mongoose';
 import dotenv from 'dotenv'
 import userRoute from './routes/user.route.js'
+import rolesRoute from "./routes/business-role-route.js"
 import cookieParser from 'cookie-parser';
 const app = express();
 app.use(cors({
@@ -25,6 +26,7 @@ try {
 }
 
 app.use('/api/auth', userRoute)
+app.use('/api/roles', rolesRoute)
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

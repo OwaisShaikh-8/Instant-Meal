@@ -19,7 +19,7 @@ export const authApi = createApi({
         try {
           const { data } = await queryFulfilled;
           dispatch(setCredentials(data));
-        } catch (error) {
+        } catch {
           // Axios interceptor handles UI feedback
         }
       },
@@ -39,7 +39,7 @@ export const authApi = createApi({
         try {
           const { data } = await queryFulfilled;
           dispatch(setCredentials(data));
-        } catch (error) {
+        } catch  {
           // Axios interceptor handles UI feedback
         }
       },
@@ -55,7 +55,7 @@ export const authApi = createApi({
         try {
           await queryFulfilled; // ✅ Wait for API response
           dispatch(logout());
-        } catch (error) {
+        } catch  {
           // ✅ Logout locally even if server fails (good UX)
           dispatch(logout());
         }

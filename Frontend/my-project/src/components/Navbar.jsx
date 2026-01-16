@@ -53,7 +53,7 @@ const Navbar = () => {
     }
   `}
         >
-          <button onClick={() => document.getElementById("my_modal_1")?.showModal() } className="bg-[#FFA31A] text-white px-6 py-2 rounded-full w-full font-bold hover:bg-[#FFA31A]/80   transition">
+          <button onClick={() => setIsLoginModalOpen(true) } className="bg-[#FFA31A] text-white px-6 py-2 rounded-full w-full font-bold hover:bg-[#FFA31A]/80   transition">
             Login
           </button>
         </div>

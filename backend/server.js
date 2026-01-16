@@ -14,7 +14,7 @@ const app = express();
 
 app.use(cors({
   // origin: "http://localhost:5173", 
-  origin: "https://instant-meal-red.vercel.app/", 
+  origin: "https://instant-meal-red.vercel.app", 
   credentials: true // allow cookie
 }));
 

@@ -13,7 +13,8 @@ const app = express();
 // Set custom DNS servers
 
 app.use(cors({
-  origin: "http://localhost:5173", // frontend origin
+  // origin: "http://localhost:5173", 
+  origin: "https://instant-meal-red.vercel.app/", 
   credentials: true // allow cookie
 }));
 

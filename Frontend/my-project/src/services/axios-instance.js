@@ -4,7 +4,7 @@ import { logout } from "../redux/slice/auth-slice";
 import toast from "react-hot-toast";
 // ✅ Create instance
 const axiosInstance = axios.create({
-  baseURL: "serene-gentleness-production.up.railway.app/api/",
+  baseURL: "https://serene-gentleness-production.up.railway.app/api/",
   // baseURL: "http://localhost:4002/api/",
   withCredentials: true,
 });

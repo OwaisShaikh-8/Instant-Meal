@@ -44,7 +44,9 @@ const useAuth = () => {
 
       if (response.user.role === "vendor") {
         if (response.hasRoles) {
-          targetRoute = "/vendorhome"; // roles not set
+          targetRoute = `/vendorhome`; // roles not set
+          // targetRoute = "/admindashboard"; // roles are set
+
         } else {
           targetRoute = "/admindashboard"; // roles are set
         }

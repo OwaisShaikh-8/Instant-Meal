@@ -10,6 +10,7 @@ import LandingPage from "./layouts/public/LandingPage.jsx";
 import VendorHome from "./layouts/private/Vendor/VendorHome.jsx";
 import CustomerHome from "./layouts/private/Customer/CustomerHome.jsx";
 import AdminDashboard from "./layouts/private/Vendor/Admin/AdminDashboard.jsx";
+import ManageRoles from "./layouts/private/Vendor/Admin/ManageRoles.jsx";
 
 const router = createBrowserRouter([
   {
@@ -24,10 +25,16 @@ const router = createBrowserRouter([
     path: "/customerhome",
     element: <CustomerHome />,
   },
-  {
-    path:"/admindashboard",
-    element:<AdminDashboard/>
-  }
+{
+  path: "/admindashboard",
+  element: <AdminDashboard />,
+  children: [
+    {
+      path: "manageroles/:id",
+      element: <ManageRoles />
+    }
+  ]
+}
 
 
 

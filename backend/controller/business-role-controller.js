@@ -1,4 +1,4 @@
-import  BusinessRole  from "../models/business-role-schema.js";
+import BusinessRole from "../models/business-role-schema.js";
 
 
 export const createBusinessRole = async (req, res) => {
@@ -22,7 +22,7 @@ export const createBusinessRole = async (req, res) => {
         res.status(201).json({
             success: true,
             message: "Business roles created successfully",
-            allRoles: roles.personName
+            allRoles: roles
         });
     } catch (error) {
         res.status(500).json({
@@ -35,41 +35,44 @@ export const createBusinessRole = async (req, res) => {
 
 
 export const getBusinessRoleByUser = async (req, res) => {
-  try {
-    const { userId } = req.params;
+    console.log("get controller hit")
+    try {
+        const { id } = req.query;
 
-    const businessRole = await BusinessRole.findOne({ user: userId })
-      .select(
-        "-roles.admin.secretKey -roles.manager.secretKey -roles.chef.secretKey -roles.deliveryPartner.secretKey"
-      )
-      
+        const businessRole = await BusinessRole.findOne({ user: id })
+            .select(
+                "-roles.admin.secretKey -roles.manager.secretKey -roles.chef.secretKey -roles.deliveryPartner.secretKey"
+            )
 
-    if (!businessRole) {
-      return res.status(404).json({
-        success: false,
-        message: "Business roles not found",
-      });
+        //   console.log(id);
+
+        if (!businessRole) {
+            return res.status(404).json({
+                success: false,
+                message: "Business roles not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            allRoles: businessRole.roles,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch business roles",
+            error: error.message,
+        });
     }
-
-    res.status(200).json({
-      success: true,
-      data: allRoles = businessRole.roles,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch business roles",
-      error: error.message,
-    });
-  }
 };
 
 
 // Helper for veriybusiness roles
 
-const verifyRoleSecretKey = async (req, res, roleName) => {
+export const verifyRoleSecretKey = async (req, res ) => {
+    console.log("verify route hit")
     try {
-        const { userId, secretKey } = req.body;
+        const { userId, roleName,secretKey } = req.body;
 
         if (!userId || !secretKey) {
             return res.status(400).json({
@@ -108,19 +111,3 @@ const verifyRoleSecretKey = async (req, res, roleName) => {
     }
 };
 
-
-export const verifyAdmin = async (req, res) => {
-    return verifyRoleSecretKey(req, res, "admin");
-};
-
-export const verifyManager = async (req, res) => {
-    return verifyRoleSecretKey(req, res, "manager");
-};
-
-export const verifyChef = async (req, res) => {
-    return verifyRoleSecretKey(req, res, "chef");
-};
-
-export const verifyDeliveryPartner = async (req, res) => {
-    return verifyRoleSecretKey(req, res, "deliveryPartner");
-};

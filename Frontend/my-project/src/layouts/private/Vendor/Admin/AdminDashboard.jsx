@@ -5,10 +5,11 @@ import Avatar from "react-avatar";
 import Dashmain from "./Dashmain";
 import ManageRoles from "./ManageRoles";
 import useAuth from "../../../../hooks/use-auth.js";
+import { Link } from "react-router-dom";
 const AdminDashboard = () => {
 
 
-  const { hasRoles } = useAuth();
+  const { hasRoles ,loggedInUser } = useAuth();
   return (
     <div className="flex">
       <div className="p-[20px] bg-[#1C1C1C] flex lg:hidden justify-between absolute top-0 right-0 left-0">
@@ -65,7 +66,7 @@ const AdminDashboard = () => {
               </svg>
               Dashboard
             </li>
-            <li className="flex gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center hover:bg-[#F38030] rounded-[4px] cursor-pointer">
+            <Link to={`manageroles/${loggedInUser?._id}`}  className="flex gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center hover:bg-[#F38030] rounded-[4px] cursor-pointer">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -78,7 +79,7 @@ const AdminDashboard = () => {
                 />
               </svg>
               Manage Roles
-            </li>
+            </Link>
             <li className="flex gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center hover:bg-[#F38030] rounded-[4px] cursor-pointer">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +97,7 @@ const AdminDashboard = () => {
           </ul>
 
           {
-            hasRoles &&
+            !hasRoles &&
                           <ul className="flex flex-col gap-[10px] mt-[51px]">
             <li className="text-[12px] leading-[100%] tracking-[0%] uppercase text-[#9B9B9B]">
               Pricing
@@ -179,8 +180,8 @@ const AdminDashboard = () => {
             <Avatar name="Owais Shaikh" size="40" round />
           </span>
         </div>
-        {/* <Outlet /> */}
-        <ManageRoles/>
+        <Outlet />
+        {/* <ManageRoles/> */}
       </div>
     </div>
   );

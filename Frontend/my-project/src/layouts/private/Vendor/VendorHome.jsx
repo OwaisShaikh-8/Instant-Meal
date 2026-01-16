@@ -7,12 +7,22 @@ import {
   Truck,
   AlertCircle,
 } from "lucide-react";
-
+import VerifyRoleModal from "../../../components/VerifyRoleModal";
 
 
 import useAuth from "../../../hooks/use-auth";
 const VendorHome = () => {
   const [hoveredRole, setHoveredRole] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [activeRole, setActiveRole] = useState(null); // "admin" | "vendor"
+
+
+
+  const handleRoleClick = (role) => {
+  setActiveRole(role);
+  setIsModalOpen(true);
+};
+
 
   const roles = [
     {
@@ -86,6 +96,7 @@ const VendorHome = () => {
                 key={role.id}
                 onMouseEnter={() => setHoveredRole(role.id)}
                 onMouseLeave={() => setHoveredRole(null)}
+                onClick={() => handleRoleClick(role.name)}
                 className="group cursor-pointer bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-[#FFA31A] hover:-translate-y-2"
               >
                 <div className="flex flex-col items-center text-center space-y-4">
@@ -128,6 +139,7 @@ const VendorHome = () => {
           </div>
         </div>
       </main>
+      <VerifyRoleModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} roleName={activeRole}/>
     </div>
   );
 };

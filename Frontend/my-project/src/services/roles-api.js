@@ -3,72 +3,99 @@ import axiosBaseQuery from "./axios-base-query";
 import {
   setActiveRole,
   setAllRoles,
-  resetRoles,
 } from "../redux/slice/roles-slice.js";
 
 export const rolesApi = createApi({
   reducerPath: "rolesApi",
   baseQuery: axiosBaseQuery(),
+  tagTypes: ['Roles', 'ActiveRole'],
   endpoints: (builder) => ({
 
     // 🔹 GET USER ROLES
     getRoles: builder.query({
-      query: () => ({
-        url: "roles/getRoles",
+      query: (userId) => ({
+        url: "roles/get",
         method: "GET",
+        params: {id : userId}
       }),
+      providesTags: ['Roles'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           dispatch(setAllRoles(data.allRoles));
         } catch {
-          // handled globally
+          // ✅ Error handled by axios interceptor
         }
       },
+      
     }),
 
-    // 🔹 CREATE ROLES
+    // 🔹 CREATE ROLE
     createRoles: builder.mutation({
       query: (rolesData) => ({
         url: "roles/create",
         method: "POST",
         data: rolesData,
       }),
+      invalidatesTags: ['Roles'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          // assume backend returns updated roles list
           dispatch(setAllRoles(data.allRoles));
         } catch {
-          // handled globally
+          // ✅ Error handled by axios interceptor
         }
       },
     }),
 
-    // 🔹 SWITCH ROLE
-    switchRole: builder.mutation({
-      query: (role) => ({
-        url: "roles/switch",
-        method: "POST",
-        data: { role },
+  
+   
+
+    // 🔹 DELETE ROLE
+    deleteRole: builder.mutation({
+      query: (roleId) => ({
+        url: `roles/delete/${roleId}`,
+        method: "DELETE",
       }),
-      async onQueryStarted(role, { dispatch, queryFulfilled }) {
+      invalidatesTags: ['Roles'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setAllRoles(data.allRoles));
+        } catch {
+          // ✅ Error handled by axios interceptor
+        }
+      },
+    }),
+
+    // 🔹 SWITCH ROLE (with optimistic update)
+    switchRole: builder.mutation({
+      query: (payload) => ({
+        url: "roles/verifyrole",
+        method: "POST",
+        data: payload,
+      }),
+      invalidatesTags: ['ActiveRole'],
+      async onQueryStarted(payload, { dispatch, queryFulfilled, getState }) {
+        const previousRole = getState().roles?.activeRole;
+        
+        // Optimistically update UI
+        dispatch(setActiveRole());
+
         try {
           await queryFulfilled;
-          dispatch(setActiveRole(role));
         } catch {
-          // rollback if needed
+          // Rollback on failure
+          if (previousRole) {
+            dispatch(setActiveRole(previousRole));
+          }
+          // ✅ Error handled by axios interceptor
         }
       },
     }),
 
-    // 🔹 CLEAR ROLES (LOCAL ONLY)
-    clearRoles: builder.mutation({
-      queryFn: async () => ({ data: null }),
-      async onQueryStarted(_, { dispatch }) {
-        dispatch(resetRoles());
-      },
-    }),
+    // 🔹 GET ACTIVE ROLE
+
 
   }),
 });
@@ -76,6 +103,6 @@ export const rolesApi = createApi({
 export const {
   useGetRolesQuery,
   useCreateRolesMutation,
+  useDeleteRoleMutation,
   useSwitchRoleMutation,
-  useClearRolesMutation,
 } = rolesApi;

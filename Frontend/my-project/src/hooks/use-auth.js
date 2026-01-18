@@ -45,10 +45,9 @@ const useAuth = () => {
       if (response.user.role === "vendor") {
         if (response.hasRoles) {
           targetRoute = `/vendorhome`; // roles not set
-          // targetRoute = "/admindashboard"; // roles are set
 
         } else {
-          targetRoute = "/admindashboard"; // roles are set
+          targetRoute = "/dashboard"; // roles are set
         }
       } else {
         targetRoute = "/customerhome"; // customer flow
@@ -73,7 +72,7 @@ const useAuth = () => {
 
       // ✅ Navigate based on role
       const targetRoute = response.user.role === "vendor"
-        ? "/vendorhome"
+        ? "/dashboard"
         : "/customerhome";
 
       navigate(targetRoute);

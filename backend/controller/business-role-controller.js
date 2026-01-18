@@ -97,8 +97,8 @@ export const verifyRoleSecretKey = async (req, res ) => {
         res.status(200).json({
             success: true,
             message: `${roleName} verified successfully`,
-            role: {
-                name: businessRole.roles[roleName].name,
+            activeRole: {
+                name: businessRole.roles[roleName].personName,
                 role: roleName,
             },
         });

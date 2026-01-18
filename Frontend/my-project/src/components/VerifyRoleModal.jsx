@@ -17,7 +17,7 @@ const VerifyRoleModal = ({ isOpen, setIsOpen, roleName }) => {
   } = useForm({
     resolver: zodResolver(secretKeySchema),
   });
-  const { changeActiveRoles, isSwitchRoleLoading } = useRoles();
+  const { changeActiveRole, isSwitchRoleLoading } = useRoles();
 
   const { loggedInUser } = useAuth();
   // 2️⃣ Submit handler
@@ -28,7 +28,7 @@ const VerifyRoleModal = ({ isOpen, setIsOpen, roleName }) => {
       ...data,
     };
     console.log(payload);
-    await changeActiveRoles(payload);
+    await changeActiveRole(payload);
     setIsOpen(false);
   };
 

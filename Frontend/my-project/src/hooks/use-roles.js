@@ -8,11 +8,13 @@ import {
 } from "../services/roles-api.js";
 import { resetRoles } from "../redux/slice/roles-slice.js";
 import useAuth from "./use-auth.js";
+import { useNavigate } from "react-router-dom";
 
 const useRoles = ({ 
   userId = null, 
 } = {}) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate()
   const { hasRoles } = useAuth();
 
   // 📦 Redux state
@@ -93,11 +95,12 @@ const useRoles = ({
   const changeActiveRole = useCallback(async (payload) => {
     try {
       const response = await switchRole(payload).unwrap();
+      navigate('/dashboard')
       return response;
     } catch {
       // ✅ Error handled by axios interceptor
     }
-  }, [switchRole]);
+  }, [switchRole, navigate]);
 
 
 

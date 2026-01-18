@@ -77,10 +77,12 @@ export const rolesApi = createApi({
       }),
       invalidatesTags: ['ActiveRole'],
       async onQueryStarted(payload, { dispatch, queryFulfilled, getState }) {
+        const {data} = await queryFulfilled
+        console.log(data)
         const previousRole = getState().roles?.activeRole;
         
         // Optimistically update UI
-        dispatch(setActiveRole());
+        dispatch(setActiveRole( data.activeRole));
 
         try {
           await queryFulfilled;

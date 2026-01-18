@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { MapPin, Star, Clock, Bike, TrendingUp, Flame, Search, Filter } from 'lucide-react';
-import CustomerHeader from "../../../components/CustomerHeader.jsx"
+import React, { useState, useMemo, useCallback } from 'react';
+import { Flame, Search, Filter } from 'lucide-react';
+import CustomerHeader from "../../../components/CustomerHeader.jsx";
 import RestroCard from '../../../components/RestroCard.jsx';
-
 
 const DealsMarque = () => (
   <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white py-3 overflow-hidden">
@@ -15,97 +14,115 @@ const DealsMarque = () => (
   </div>
 );
 
+// Static restaurant data
+const restroDeals = [
+  {
+    id: 1,
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
+    name: "Food Street Restaurant",
+    address: "Shahrah-e-Faisal, Karachi",
+    rating: 4.5,
+    deliveryTime: "25-30 min",
+    cuisines: ["Pakistani", "BBQ", "Fast Food"],
+    promoted: true,
+  },
+  {
+    id: 2,
+    image: "https://images.unsplash.com/photo-1528605248644-14dd04022da1",
+    name: "BBQ Tonight",
+    address: "Clifton Block 5, Karachi",
+    rating: 4.8,
+    deliveryTime: "30-35 min",
+    cuisines: ["BBQ", "Grill", "Pakistani"],
+    promoted: false,
+  },
+  {
+    id: 3,
+    image: "https://images.unsplash.com/photo-1541542684-4a6d8e6c7c0f",
+    name: "Kolachi Restaurant",
+    address: "Do Darya, Phase 8, Karachi",
+    rating: 4.6,
+    deliveryTime: "35-40 min",
+    cuisines: ["Pakistani", "Chinese", "Continental"],
+    promoted: true,
+  },
+  {
+    id: 4,
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+    name: "Tuscany Courtyard",
+    address: "Zamzama Boulevard, Karachi",
+    rating: 4.7,
+    deliveryTime: "20-25 min",
+    cuisines: ["Italian", "Continental"],
+    promoted: false,
+  },
+  {
+    id: 5,
+    image: "https://images.unsplash.com/photo-1552566626-52f8b828add9",
+    name: "Student Biryani",
+    address: "Multiple Locations, Karachi",
+    rating: 4.4,
+    deliveryTime: "15-20 min",
+    cuisines: ["Biryani", "Pakistani", "Fast Food"],
+    promoted: false,
+  },
+  {
+    id: 6,
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
+    name: "Café Aylanto",
+    address: "Main Clifton, Karachi",
+    rating: 4.9,
+    deliveryTime: "30-35 min",
+    cuisines: ["Continental", "Mediterranean"],
+    promoted: true,
+  },
+];
 
+// Static categories
+const categories = [
+  { id: 'all', label: 'All', icon: '🍽️' },
+  { id: 'fast', label: 'Fast Food', icon: '🍔' },
+  { id: 'bbq', label: 'BBQ', icon: '🍗' },
+  { id: 'pakistani', label: 'Pakistani', icon: '🍛' },
+  { id: 'italian', label: 'Italian', icon: '🍕' },
+];
 
+// Memoized category button
+const CategoryButton = React.memo(({ cat, active, onClick }) => (
+  <button
+    onClick={() => onClick(cat.id)}
+    className={`flex items-center gap-2 px-6 py-3 rounded-full whitespace-nowrap font-medium transition-all duration-300 ${
+      active
+        ? 'bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] text-white shadow-lg scale-105'
+        : 'bg-white text-gray-700 hover:bg-gray-50 shadow'
+    }`}
+  >
+    <span className="text-xl">{cat.icon}</span>
+    <span>{cat.label}</span>
+  </button>
+));
 
 const Customer = () => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const restroDeals = [
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
-      name: "Food Street Restaurant",
-      address: "Shahrah-e-Faisal, Karachi",
-      rating: 4.5,
-      deliveryTime: "25-30 min",
-      cuisines: ["Pakistani", "BBQ", "Fast Food"],
-      promoted: true,
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1528605248644-14dd04022da1",
-      name: "BBQ Tonight",
-      address: "Clifton Block 5, Karachi",
-      rating: 4.8,
-      deliveryTime: "30-35 min",
-      cuisines: ["BBQ", "Grill", "Pakistani"],
-      promoted: false,
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1541542684-4a6d8e6c7c0f",
-      name: "Kolachi Restaurant",
-      address: "Do Darya, Phase 8, Karachi",
-      rating: 4.6,
-      deliveryTime: "35-40 min",
-      cuisines: ["Pakistani", "Chinese", "Continental"],
-      promoted: true,
-    },
-    {
-      id: 4,
-      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
-      name: "Tuscany Courtyard",
-      address: "Zamzama Boulevard, Karachi",
-      rating: 4.7,
-      deliveryTime: "20-25 min",
-      cuisines: ["Italian", "Continental"],
-      promoted: false,
-    },
-    {
-      id: 5,
-      image: "https://images.unsplash.com/photo-1552566626-52f8b828add9",
-      name: "Student Biryani",
-      address: "Multiple Locations, Karachi",
-      rating: 4.4,
-      deliveryTime: "15-20 min",
-      cuisines: ["Biryani", "Pakistani", "Fast Food"],
-      promoted: false,
-    },
-    {
-      id: 6,
-      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
-      name: "Café Aylanto",
-      address: "Main Clifton, Karachi",
-      rating: 4.9,
-      deliveryTime: "30-35 min",
-      cuisines: ["Continental", "Mediterranean"],
-      promoted: true,
-    },
-  ];
+  // useCallback to avoid creating new function on every render
+  const handleFilter = useCallback((id) => setFilter(id), []);
 
-  const categories = [
-    { id: 'all', label: 'All', icon: '🍽️' },
-    { id: 'fast', label: 'Fast Food', icon: '🍔' },
-    { id: 'bbq', label: 'BBQ', icon: '🍗' },
-    { id: 'pakistani', label: 'Pakistani', icon: '🍛' },
-    { id: 'italian', label: 'Italian', icon: '🍕' },
-  ];
-
-   const filteredRestaurants = useMemo(() => {
+  // Memoized filtered restaurants
+  const filteredRestaurants = useMemo(() => {
     return restroDeals.filter(restro => {
       const matchesSearch = restro.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesFilter = filter === 'all' || 
+      const matchesFilter = filter === 'all' ||
         restro.cuisines.some(c => c.toLowerCase().includes(filter.toLowerCase()));
       return matchesSearch && matchesFilter;
     });
-  }, [restroDeals, filter, searchTerm]);
+  }, [filter, searchTerm]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <CustomerHeader />
-      
+
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-[#FFA31A] to-[#FF8C00] relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
@@ -124,7 +141,7 @@ const Customer = () => {
             <p className="text-white/90 text-lg mb-8">
               Discover the best restaurants near you with amazing deals and fast delivery
             </p>
-            
+
             {/* Search Bar */}
             <div className="bg-white rounded-2xl p-2 shadow-2xl flex items-center gap-3 max-w-2xl">
               <Search className="w-6 h-6 text-gray-400 ml-3" />
@@ -149,18 +166,12 @@ const Customer = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
           {categories.map((cat) => (
-            <button
+            <CategoryButton
               key={cat.id}
-              onClick={() => setFilter(cat.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full whitespace-nowrap font-medium transition-all duration-300 ${
-                filter === cat.id
-                  ? 'bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 shadow'
-              }`}
-            >
-              <span className="text-xl">{cat.icon}</span>
-              <span>{cat.label}</span>
-            </button>
+              cat={cat}
+              active={filter === cat.id}
+              onClick={handleFilter}
+            />
           ))}
         </div>
       </div>
@@ -206,6 +217,23 @@ const Customer = () => {
         )}
       </div>
 
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          display: inline-block;
+          animation: marquee 20s linear infinite;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };

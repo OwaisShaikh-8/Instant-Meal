@@ -53,7 +53,7 @@ const useAuth = () => {
         targetRoute = "/customerhome"; // customer flow
       }
 
-      navigate(targetRoute);
+      navigate(targetRoute, { replace: true });
 
       return response;
     } catch{

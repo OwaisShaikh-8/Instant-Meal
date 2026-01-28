@@ -10,11 +10,14 @@ import {
   MapPin,
   Phone,
   Mail,
+  Loader2,
 } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useAuth from "../../../../hooks/use-auth";
+import useRestaurant from "../../../../hooks/use-restaurant";
+import AddMenuItem from "../../../../components/AddMenu";
 
 const PAKISTANI_CITIES = [
   { id: 1, name: "Karachi", province: "Sindh" },
@@ -29,7 +32,6 @@ const PAKISTANI_CITIES = [
   { id: 10, name: "Gujranwala", province: "Punjab" },
 ];
 
-// Zod validation schema
 const restaurantSchema = z.object({
   name: z
     .string()
@@ -53,11 +55,14 @@ const restaurantSchema = z.object({
 
 const ManageRestaurant = () => {
   const { loggedInUser } = useAuth();
-  const [restaurantCreated, setRestaurantCreated] = useState(false);
+  const {
+    createNewRestaurant,
+    isCreateRestaurantLoading,
+    activeRestaurant,
+    isMyRestaurantLoading,
+  } = useRestaurant({ shouldFetchMyRestaurant: true });
   const [bannerPreview, setBannerPreview] = useState(null);
   const [addMenuActive, setAddMenuActive] = useState(false);
-
-  // Mock restaurant data (when already created)
   const [restaurantData, setRestaurantData] = useState(null);
 
   const {
@@ -75,7 +80,7 @@ const ManageRestaurant = () => {
       contact: "",
       email: "",
       address: "",
-      city:"",
+      city: "",
       description: "",
       banner: null,
     },
@@ -95,11 +100,39 @@ const ManageRestaurant = () => {
   };
 
   const onSubmit = async (data) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setRestaurantData(data);
-    setRestaurantCreated(true);
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("contact", data.contact);
+    formData.append("email", data.email);
+    formData.append("address", data.address);
+    formData.append("city", data.city);
+    formData.append("description", data.description || "");
+    formData.append("banner", data.banner);
+
+    await createNewRestaurant(formData);
   };
+
+  // Show loading state while fetching restaurant data
+  if (isMyRestaurantLoading) {
+    return (
+      <div className="">
+        <div className="flex items-center gap-3 mb-6">
+          <Store className="w-8 h-8 text-gray-700" />
+          <h3 className="text-3xl font-light text-gray-800">
+            Manage Restaurant
+          </h3>
+        </div>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+          <div className="flex flex-col items-center justify-center py-24">
+            <Loader2 className="w-12 h-12 text-[#FFA31A] animate-spin mb-4" />
+            <p className="text-gray-600 font-medium">
+              Loading restaurant details...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="">
@@ -108,7 +141,7 @@ const ManageRestaurant = () => {
         <h3 className="text-3xl font-light text-gray-800">Manage Restaurant</h3>
       </div>
 
-      {!restaurantCreated ? (
+      {!activeRestaurant ? (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           <div className="bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] p-6">
             <h4 className="text-2xl font-semibold text-white mb-1">
@@ -355,17 +388,17 @@ const ManageRestaurant = () => {
             {/* Submit Button */}
             <button
               onClick={handleSubmit(onSubmit)}
-              disabled={isSubmitting || !isValid}
+              disabled={isSubmitting || !isValid || isCreateRestaurantLoading}
               className={`w-full py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 transition-all duration-300
                 ${
-                  isSubmitting || !isValid
+                  !isValid || isCreateRestaurantLoading
                     ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                     : "bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] text-white hover:shadow-lg hover:scale-[1.02]"
                 }`}
             >
-              {isSubmitting ? (
+              {isCreateRestaurantLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   Creating Restaurant...
                 </>
               ) : (
@@ -378,21 +411,142 @@ const ManageRestaurant = () => {
           </div>
         </div>
       ) : (
+        // <div className="space-y-6">
+        //   {/* Restaurant Details Card */}
+        //   <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        //     {/* Banner Image */}
+        //     {activeRestaurant && (
+        //       <div className="relative h-64 overflow-hidden">
+
+        //         <img
+        //           src={activeRestaurant.data.banner.url}
+        //           alt="Restaurant banner"
+        //           className="w-full h-full object-cover"
+        //         />
+        //         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        //         <div className="absolute bottom-6 left-6">
+        //           <h2 className="text-3xl font-bold text-white mb-1">
+        //             {activeRestaurant.data.name}
+        //           </h2>
+        //           <div className="flex items-center gap-2">
+        //             <div className="bg-green-500 px-3 py-1 rounded-full">
+        //               <span className="text-xs font-medium text-white flex items-center gap-1">
+        //                 <CheckCircle className="w-3 h-3" />
+        //                 Active
+        //               </span>
+        //             </div>
+        //           </div>
+        //         </div>
+        //       </div>
+        //     )}
+
+        //     {/* Restaurant Info */}
+        //     <div className="p-8">
+        //       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        //         <div className="flex items-start gap-3">
+        //           <div className="bg-blue-100 p-2 rounded-lg">
+        //             <Phone className="w-5 h-5 text-blue-600" />
+        //           </div>
+        //           <div>
+        //             <p className="text-xs text-gray-500 mb-1">Contact</p>
+        //             <p className="text-gray-800 font-semibold">
+        //               {activeRestaurant?.data.contact}
+        //             </p>
+        //           </div>
+        //         </div>
+
+        //         <div className="flex items-start gap-3">
+        //           <div className="bg-purple-100 p-2 rounded-lg">
+        //             <Mail className="w-5 h-5 text-purple-600" />
+        //           </div>
+        //           <div>
+        //             <p className="text-xs text-gray-500 mb-1">Email</p>
+        //             <p className="text-gray-800 font-semibold">
+        //               {activeRestaurant?.data.email}
+        //             </p>
+        //           </div>
+        //         </div>
+
+        //         <div className="flex items-start gap-3 md:col-span-2">
+        //           <div className="bg-green-100 p-2 rounded-lg">
+        //             <MapPin className="w-5 h-5 text-green-600" />
+        //           </div>
+        //           <div>
+        //             <p className="text-xs text-gray-500 mb-1">Address</p>
+        //             <p className="text-gray-800 font-semibold">
+        //               {activeRestaurant?.data.address}
+        //             </p>
+        //           </div>
+        //         </div>
+
+        //         {activeRestaurant?.data.description && (
+        //           <div className="md:col-span-2">
+        //             <p className="text-xs text-gray-500 mb-2">Description</p>
+        //             <p className="text-gray-700 leading-relaxed">
+        //               {activeRestaurant.data.description}
+        //             </p>
+        //           </div>
+        //         )}
+        //       </div>
+        //     </div>
+        //   </div>
+
+        //   {/* Add Menu Section */}
+        //   <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-6 border-2 border-orange-200">
+        //     <div className="flex items-start gap-4">
+        //       <div className="bg-[#FFA31A] p-3 rounded-xl">
+        //         <Utensils className="w-6 h-6 text-white" />
+        //       </div>
+        //       <div className="flex-1">
+        //         <h4 className="text-xl font-semibold text-gray-800 mb-2">
+        //           Menu Management
+        //         </h4>
+        //         <p className="text-gray-600 mb-4">
+        //           Your restaurant is ready! Now you can add menu items,
+        //           categories, and manage your offerings.
+        //         </p>
+        //         <button
+        //           onClick={() => setAddMenuActive(true)}
+        //           className="flex items-center gap-2 bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] px-6 py-3 rounded-xl text-white font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
+        //         >
+        //           <Plus className="w-5 h-5" />
+        //           Add Menu Items
+        //         </button>
+        //       </div>
+        //     </div>
+        //   </div>
+
+        //   {/* Info Box */}
+        //   <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+        //     <div className="flex items-start gap-3">
+        //       <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        //       <div>
+        //         <p className="text-sm font-medium text-blue-900 mb-1">
+        //           Restaurant Successfully Created
+        //         </p>
+        //         <p className="text-xs text-blue-700">
+        //           You can now manage your menu items, view orders, and update
+        //           restaurant details anytime.
+        //         </p>
+        //       </div>
+        //     </div>
+        //   </div>
+        // </div>
         <div className="space-y-6">
           {/* Restaurant Details Card */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             {/* Banner Image */}
-            {bannerPreview && (
+            {activeRestaurant && (
               <div className="relative h-64 overflow-hidden">
                 <img
-                  src={bannerPreview}
+                  src={activeRestaurant.data.banner.url}
                   alt="Restaurant banner"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-6 left-6">
                   <h2 className="text-3xl font-bold text-white mb-1">
-                    {restaurantData?.name}
+                    {activeRestaurant.data.name}
                   </h2>
                   <div className="flex items-center gap-2">
                     <div className="bg-green-500 px-3 py-1 rounded-full">
@@ -403,6 +557,24 @@ const ManageRestaurant = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Delete Button */}
+                <button
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this restaurant? This action cannot be undone.",
+                      )
+                    ) {
+                      // Call your delete function here
+                      // deleteRestaurant(activeRestaurant.data._id);
+                    }
+                  }}
+                  className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 gap-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110 flex items-center justify-center group"
+                  title="Delete Restaurant"
+                >
+                  Delete
+                </button>
               </div>
             )}
 
@@ -416,7 +588,7 @@ const ManageRestaurant = () => {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Contact</p>
                     <p className="text-gray-800 font-semibold">
-                      {restaurantData?.contact}
+                      {activeRestaurant?.data.contact}
                     </p>
                   </div>
                 </div>
@@ -428,7 +600,7 @@ const ManageRestaurant = () => {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Email</p>
                     <p className="text-gray-800 font-semibold">
-                      {restaurantData?.email}
+                      {activeRestaurant?.data.email}
                     </p>
                   </div>
                 </div>
@@ -440,16 +612,16 @@ const ManageRestaurant = () => {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Address</p>
                     <p className="text-gray-800 font-semibold">
-                      {restaurantData?.address}
+                      {activeRestaurant?.data.address}
                     </p>
                   </div>
                 </div>
 
-                {restaurantData?.description && (
+                {activeRestaurant?.data.description && (
                   <div className="md:col-span-2">
                     <p className="text-xs text-gray-500 mb-2">Description</p>
                     <p className="text-gray-700 leading-relaxed">
-                      {restaurantData.description}
+                      {activeRestaurant.data.description}
                     </p>
                   </div>
                 )}
@@ -457,46 +629,10 @@ const ManageRestaurant = () => {
             </div>
           </div>
 
-          {/* Add Menu Section */}
-          <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-6 border-2 border-orange-200">
-            <div className="flex items-start gap-4">
-              <div className="bg-[#FFA31A] p-3 rounded-xl">
-                <Utensils className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-semibold text-gray-800 mb-2">
-                  Menu Management
-                </h4>
-                <p className="text-gray-600 mb-4">
-                  Your restaurant is ready! Now you can add menu items,
-                  categories, and manage your offerings.
-                </p>
-                <button
-                  onClick={() => setAddMenuActive(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] px-6 py-3 rounded-xl text-white font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
-                >
-                  <Plus className="w-5 h-5" />
-                  Add Menu Items
-                </button>
-              </div>
-            </div>
-          </div>
+         
 
-          {/* Info Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-blue-900 mb-1">
-                  Restaurant Successfully Created
-                </p>
-                <p className="text-xs text-blue-700">
-                  You can now manage your menu items, view orders, and update
-                  restaurant details anytime.
-                </p>
-              </div>
-            </div>
-          </div>
+<AddMenuItem/>
+       
         </div>
       )}
     </div>

@@ -344,7 +344,7 @@ const Dashboard = () => {
       <div className="p-[30px] pt-[100px] lg:pt-[30px]  w-full bg-[#f9f9f9]">
         <div className="flex justify-between">
           <p className="text-[20px] leading-[100%] tracking-[0%]  text-[#797979]">
-            {!hasRoles ? loggedInUser.fullname : formattedRole}
+            {!hasRoles ? loggedInUser?.fullname : formattedRole}
           </p>
           <span className="flex gap-[20px] items-center">
             <svg

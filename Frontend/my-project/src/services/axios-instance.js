@@ -48,9 +48,9 @@ axiosInstance.interceptors.response.use(
     toast.error(`${message}`);
 
     // 🔐 Auto logout on auth errors
-    if (status === 401 || status === 403) {
-      store.dispatch(logout());
-    }
+    // if (status === 401 || status === 403) {
+    //   store.dispatch(logout());
+    // }
 
     return Promise.reject(error);
   }

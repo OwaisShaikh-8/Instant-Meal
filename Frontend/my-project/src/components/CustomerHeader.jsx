@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Menu, X, MapPin, User, Settings, LogOut, Search, ShoppingCart, Package, Home } from "lucide-react";
 import Avatar from "react-avatar";
 import useAuth from "../hooks/use-auth";
-
+import useRestaurant from "../hooks/use-restaurant";
 
 
 
@@ -11,7 +11,7 @@ const CustomerHeader = () => {
   const [open, setOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [location, setLocation] = useState("Hyderabad, Sindh");
+  const [location, setLocation] = useState("sialkot");
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartCount] = useState(3);
@@ -20,24 +20,21 @@ const CustomerHeader = () => {
   const profileRef = useRef(null);
   const searchRef = useRef(null);
 
-  const restaurants = [
-    "KFC",
-    "McDonald's",
-    "Pizza Hut",
-    "Al Baik",
-    "Student Biryani",
-    "Burger Lab",
-    "Cafe Student",
-    "Domino's Pizza",
-    "Dadies Chicken",
-  ];
+  const cityname = location.toLowerCase();
+
+ const {restaurants,fetchRestaurantsByCity} = useRestaurant({city:cityname ,shouldFetchByCity:true })
 
 
-  const filteredRestaurants = useMemo(() => {
-    return restaurants.filter((item) =>
-      item.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search]);
+
+
+ const filteredRestaurants = useMemo(() => {
+  return restaurants?.filter((restaurant) =>
+    restaurant.name
+      ?.toLowerCase()
+      .includes(search.toLowerCase())
+  );
+}, [restaurants, search]);
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -55,6 +52,12 @@ const CustomerHeader = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    fetchRestaurantsByCity()
+  }, [location])
+  
+
 
 
   const {logoutUser, isLogoutLoading} = useAuth()
@@ -100,7 +103,7 @@ const CustomerHeader = () => {
                     <div className="px-4 py-3 bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] text-white font-semibold text-sm">
                       Select Location
                     </div>
-                    {["Hyderabad, Sindh", "Karachi, Sindh", "Lahore, Punjab", "Islamabad, Capital"].map(
+                    {["Hyderabad", "Karachi", "Lahore", "Islamabad"].map(
                       (city) => (
                         <button
                           key={city}

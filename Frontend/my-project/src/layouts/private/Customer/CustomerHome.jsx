@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { Flame, Search, Filter } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from "react";
+import { Flame, Search, Filter } from "lucide-react";
 import CustomerHeader from "../../../components/CustomerHeader.jsx";
-import RestroCard from '../../../components/RestroCard.jsx';
+import RestroCard from "../../../components/RestroCard.jsx";
+import useRestaurant from "../../../hooks/use-restaurant.js";
 
 const DealsMarque = () => (
   <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white py-3 overflow-hidden">
@@ -15,86 +16,25 @@ const DealsMarque = () => (
 );
 
 // Static restaurant data
-const restroDeals = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5",
-    name: "Food Street Restaurant",
-    address: "Shahrah-e-Faisal, Karachi",
-    rating: 4.5,
-    deliveryTime: "25-30 min",
-    cuisines: ["Pakistani", "BBQ", "Fast Food"],
-    promoted: true,
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1528605248644-14dd04022da1",
-    name: "BBQ Tonight",
-    address: "Clifton Block 5, Karachi",
-    rating: 4.8,
-    deliveryTime: "30-35 min",
-    cuisines: ["BBQ", "Grill", "Pakistani"],
-    promoted: false,
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1541542684-4a6d8e6c7c0f",
-    name: "Kolachi Restaurant",
-    address: "Do Darya, Phase 8, Karachi",
-    rating: 4.6,
-    deliveryTime: "35-40 min",
-    cuisines: ["Pakistani", "Chinese", "Continental"],
-    promoted: true,
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
-    name: "Tuscany Courtyard",
-    address: "Zamzama Boulevard, Karachi",
-    rating: 4.7,
-    deliveryTime: "20-25 min",
-    cuisines: ["Italian", "Continental"],
-    promoted: false,
-  },
-  {
-    id: 5,
-    image: "https://images.unsplash.com/photo-1552566626-52f8b828add9",
-    name: "Student Biryani",
-    address: "Multiple Locations, Karachi",
-    rating: 4.4,
-    deliveryTime: "15-20 min",
-    cuisines: ["Biryani", "Pakistani", "Fast Food"],
-    promoted: false,
-  },
-  {
-    id: 6,
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0",
-    name: "Café Aylanto",
-    address: "Main Clifton, Karachi",
-    rating: 4.9,
-    deliveryTime: "30-35 min",
-    cuisines: ["Continental", "Mediterranean"],
-    promoted: true,
-  },
-];
-
+const { restaurants } = useRestaurant();
 // Static categories
 const categories = [
-  { id: 'all', label: 'All', icon: '🍽️' },
-  { id: 'fast', label: 'Fast Food', icon: '🍔' },
-  { id: 'bbq', label: 'BBQ', icon: '🍗' },
-  { id: 'pakistani', label: 'Pakistani', icon: '🍛' },
-  { id: 'italian', label: 'Italian', icon: '🍕' },
+  { id: "all", label: "All", icon: "🍽️" },
+  { id: "fast", label: "Fast Food", icon: "🍔" },
+  { id: "bbq", label: "BBQ", icon: "🍗" },
+  { id: "pakistani", label: "Pakistani", icon: "🍛" },
+  { id: "italian", label: "Italian", icon: "🍕" },
 ];
 
+const filteredRestaurants = restaurants;
 // Memoized category button
 const CategoryButton = React.memo(({ cat, active, onClick }) => (
   <button
     onClick={() => onClick(cat.id)}
     className={`flex items-center gap-2 px-6 py-3 rounded-full whitespace-nowrap font-medium transition-all duration-300 ${
       active
-        ? 'bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] text-white shadow-lg scale-105'
-        : 'bg-white text-gray-700 hover:bg-gray-50 shadow'
+        ? "bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] text-white shadow-lg scale-105"
+        : "bg-white text-gray-700 hover:bg-gray-50 shadow"
     }`}
   >
     <span className="text-xl">{cat.icon}</span>
@@ -103,21 +43,21 @@ const CategoryButton = React.memo(({ cat, active, onClick }) => (
 ));
 
 const Customer = () => {
-  const [filter, setFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // useCallback to avoid creating new function on every render
   const handleFilter = useCallback((id) => setFilter(id), []);
 
   // Memoized filtered restaurants
-  const filteredRestaurants = useMemo(() => {
-    return restroDeals.filter(restro => {
-      const matchesSearch = restro.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesFilter = filter === 'all' ||
-        restro.cuisines.some(c => c.toLowerCase().includes(filter.toLowerCase()));
-      return matchesSearch && matchesFilter;
-    });
-  }, [filter, searchTerm]);
+  // const filteredRestaurants = useMemo(() => {
+  //   return restaurants.filter(restro => {
+  //     const matchesSearch = restro.name.toLowerCase().includes(searchTerm.toLowerCase());
+  //     const matchesFilter = filter === 'all' ||
+  //       restro.cuisines.some(c => c.toLowerCase().includes(filter.toLowerCase()));
+  //     return matchesSearch && matchesFilter;
+  //   });
+  // }, [filter, searchTerm]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -133,13 +73,18 @@ const Customer = () => {
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
               <Flame className="w-6 h-6 text-white" />
-              <span className="text-white font-semibold text-lg">Hot Deals Today</span>
+              <span className="text-white font-semibold text-lg">
+                Hot Deals Today
+              </span>
             </div>
             <h1 className="font-bold text-4xl md:text-6xl text-white mb-4 leading-tight">
-              Order Your Favorite<br />Food in Minutes
+              Order Your Favorite
+              <br />
+              Food in Minutes
             </h1>
             <p className="text-white/90 text-lg mb-8">
-              Discover the best restaurants near you with amazing deals and fast delivery
+              Discover the best restaurants near you with amazing deals and fast
+              delivery
             </p>
 
             {/* Search Bar */}
@@ -193,7 +138,7 @@ const Customer = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredRestaurants.map((restro) => (
             <RestroCard
               key={restro.id}
@@ -206,21 +151,29 @@ const Customer = () => {
               promoted={restro.promoted}
             />
           ))}
-        </div>
+        </div> */}
 
         {filteredRestaurants.length === 0 && (
           <div className="text-center py-16">
             <Search className="w-24 h-24 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-gray-700 mb-2">No restaurants found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters</p>
+            <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+              No restaurants found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your search or filters
+            </p>
           </div>
         )}
       </div>
 
       <style jsx>{`
         @keyframes marquee {
-          0% { transform: translateX(0%); }
-          100% { transform: translateX(-50%); }
+          0% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
         .animate-marquee {
           display: inline-block;

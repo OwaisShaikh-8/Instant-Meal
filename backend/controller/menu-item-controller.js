@@ -80,6 +80,7 @@ export const addMenuItem = async (req, res) => {
  * Get all menu items for a restaurant
  */
 export const getMenuItems = async (req, res) => {
+  console.log("getmenuhit")
   try {
     const { restaurantId } = req.params;
     const { page = 1, limit = 10, category, available } = req.query;
@@ -113,7 +114,7 @@ export const getMenuItems = async (req, res) => {
       total,
       page: parseInt(page),
       pages: Math.ceil(total / parseInt(limit)),
-      data: menuItems,
+      menuItems,
     });
   } catch (error) {
     res.status(500).json({ 

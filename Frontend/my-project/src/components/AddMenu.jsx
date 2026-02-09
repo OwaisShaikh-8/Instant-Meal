@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import useMenu from "../hooks/use-menu";
 import { useEffect } from "react";
 import MenuItemCard from "./MenuItem";
-
+import useRestaurant from "../hooks/use-restaurant";
 
 const MENU_CATEGORIES = [
   { id: 1, name: "Appetizers", icon: "🥗" },
@@ -44,16 +44,16 @@ const menuItemSchema = z.object({
 
 
 
-
 const AddMenu = ({ onSubmit: onSubmitCallback }) => {
-
-
   
-
+  
+  
+  
+  const {activeRestaurant} = useRestaurant()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {addMenuItem, deleteMenuItem,refetchMenu,menuItems} = useMenu();
+  const {addMenuItem, deleteMenuItem, refetchMenu, isFetching, menuItems} = useMenu(activeRestaurant?._id);
   
   const {
     control,
@@ -129,32 +129,44 @@ const AddMenu = ({ onSubmit: onSubmitCallback }) => {
       <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-6 border-2 border-orange-200">
         <div className="flex justify-between items-start gap-4">
           <div className="flex items-center gap-4">
-
-          <div className="bg-[#FFA31A] w-fit p-3 rounded-xl">
-            <Utensils className="w-6 h-6 text-white" />
-          </div>
+            <div className="bg-[#FFA31A] w-fit p-3 rounded-xl">
+              <Utensils className="w-6 h-6 text-white" />
+            </div>
             <h4 className="text-xl font-semibold text-gray-800 mb-2">Menu Management</h4>
           </div>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] px-6 py-3 rounded-xl text-white font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
-            >
-              <Plus className="w-5 h-5" />
-              Add Menu Items
-            </button>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 bg-gradient-to-r from-[#FFA31A] to-[#FF8C00] px-6 py-3 rounded-xl text-white font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
+          >
+            <Plus className="w-5 h-5" />
+            Add Menu Items
+          </button>
         </div>
-        {
-          menuItems ? <div className="flex flex-wrap gap-2">
-             {
-              menuItems.map((item) => (
 
+        {/* Loading State */}
+        {isFetching ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="w-12 h-12 text-[#FFA31A] animate-spin mb-4" />
+            <p className="text-gray-600 font-medium">Loading menu items...</p>
+          </div>
+        ) : (
+          /* Menu Items Display */
+          menuItems && menuItems.length > 0 ? (
+            <div className="flex flex-wrap gap-2 mt-6">
+              {menuItems.map((item) => (
                 <MenuItemCard key={item._id} item={item} />
-              ))
-             }
-
-                  </div> 
-          : "Your Menu is Empty"
-        }
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="bg-gray-100 p-6 rounded-full mb-4">
+                <Utensils className="w-12 h-12 text-gray-400" />
+              </div>
+              <p className="text-gray-600 font-medium text-lg">Your Menu is Empty</p>
+              <p className="text-gray-500 text-sm mt-2">Click "Add Menu Items" to get started</p>
+            </div>
+          )
+        )}
       </div>
 
       {/* Modal */}
@@ -429,7 +441,7 @@ const AddMenu = ({ onSubmit: onSubmitCallback }) => {
         </div>
       )}
 
-          <style jsx>{`
+      <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }

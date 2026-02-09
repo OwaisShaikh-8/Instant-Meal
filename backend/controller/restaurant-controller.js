@@ -73,11 +73,11 @@ export const createRestaurant = async (req, res) => {
 // @access  Private
 export const getMyRestaurant = async (req, res) => {
   try {
-    const restaurant = await Restaurant.findOne({
+    const activeRestaurant = await Restaurant.findOne({
       userId: req.user._id,
     });
 
-    if (!restaurant) {
+    if (!activeRestaurant) {
       return res.status(404).json({
         success: false,
         message: "No restaurant found for this user",
@@ -86,7 +86,7 @@ export const getMyRestaurant = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: restaurant,
+      activeRestaurant,
     });
   } catch (error) {
     console.error("Get my restaurant error:", error);
@@ -139,6 +139,7 @@ export const getRestaurantsByCity = async (req, res) => {
 
 
 export const getRestaurantByUserId = async (req, res) => {
+  
   try {
     const restaurant = await Restaurant.findOne({
       userId: req.params.userId,
@@ -153,7 +154,7 @@ export const getRestaurantByUserId = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: restaurant,
+      activeRestaurant: restaurant,
     });
   } catch (error) {
     console.error("Get restaurant error:", error);
@@ -254,6 +255,7 @@ export const getAllRestaurants = async (req, res) => {
 // @route   GET /api/restaurants/:id
 // @access  Public
 export const getRestaurantById = async (req, res) => {
+  console.log("getbyid hit")
   try {
     const restaurant = await Restaurant.findById(req.params.id);
 
@@ -266,7 +268,7 @@ export const getRestaurantById = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: restaurant,
+      restaurant,
     });
   } catch (error) {
     console.error("Get restaurant by ID error:", error);

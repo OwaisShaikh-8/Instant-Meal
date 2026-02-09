@@ -15,7 +15,7 @@ const useRoles = ({
 } = {}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
-  const { hasRoles } = useAuth();
+  const { hasRoles, logoutUser } = useAuth();
 
   // 📦 Redux state
   const allRoles = useSelector((state) => state.roles.allRoles);
@@ -72,6 +72,7 @@ const useRoles = ({
   const createUserRoles = useCallback(async (rolesData) => {
     try {
       const response = await createRoles(rolesData).unwrap();
+      logoutUser()
       return response;
     } catch {
       // ✅ Error handled by axios interceptor

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { store } from "../redux/store";
-import { logout } from "../redux/slice/auth-slice";
+// import { logoutAction } from "../redux/slice/auth-slice";
 import toast from "react-hot-toast";
 // ✅ Create instance
 const axiosInstance = axios.create({

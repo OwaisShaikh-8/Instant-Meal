@@ -85,7 +85,7 @@ const ManageRestaurant = () => {
       banner: null,
     },
   });
-
+console.log(activeRestaurant)
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -539,14 +539,14 @@ const ManageRestaurant = () => {
             {activeRestaurant && (
               <div className="relative h-64 overflow-hidden">
                 <img
-                  src={activeRestaurant.data.banner.url}
+                  src={activeRestaurant?.banner?.url}
                   alt="Restaurant banner"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-6 left-6">
                   <h2 className="text-3xl font-bold text-white mb-1">
-                    {activeRestaurant.data.name}
+                    {activeRestaurant?.name}
                   </h2>
                   <div className="flex items-center gap-2">
                     <div className="bg-green-500 px-3 py-1 rounded-full">
@@ -588,7 +588,7 @@ const ManageRestaurant = () => {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Contact</p>
                     <p className="text-gray-800 font-semibold">
-                      {activeRestaurant?.data.contact}
+                      {activeRestaurant?.contact}
                     </p>
                   </div>
                 </div>
@@ -600,7 +600,7 @@ const ManageRestaurant = () => {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Email</p>
                     <p className="text-gray-800 font-semibold">
-                      {activeRestaurant?.data.email}
+                      {activeRestaurant?.email}
                     </p>
                   </div>
                 </div>
@@ -612,16 +612,16 @@ const ManageRestaurant = () => {
                   <div>
                     <p className="text-xs text-gray-500 mb-1">Address</p>
                     <p className="text-gray-800 font-semibold">
-                      {activeRestaurant?.data.address}
+                      {activeRestaurant?.address}
                     </p>
                   </div>
                 </div>
 
-                {activeRestaurant?.data.description && (
+                {activeRestaurant?.description && (
                   <div className="md:col-span-2">
                     <p className="text-xs text-gray-500 mb-2">Description</p>
                     <p className="text-gray-700 leading-relaxed">
-                      {activeRestaurant.data.description}
+                      {activeRestaurant?.description}
                     </p>
                   </div>
                 )}

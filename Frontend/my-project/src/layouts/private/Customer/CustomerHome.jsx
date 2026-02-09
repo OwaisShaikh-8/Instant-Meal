@@ -16,7 +16,6 @@ const DealsMarque = () => (
 );
 
 // Static restaurant data
-const { restaurants } = useRestaurant();
 // Static categories
 const categories = [
   { id: "all", label: "All", icon: "🍽️" },
@@ -26,7 +25,6 @@ const categories = [
   { id: "italian", label: "Italian", icon: "🍕" },
 ];
 
-const filteredRestaurants = restaurants;
 // Memoized category button
 const CategoryButton = React.memo(({ cat, active, onClick }) => (
   <button
@@ -43,6 +41,8 @@ const CategoryButton = React.memo(({ cat, active, onClick }) => (
 ));
 
 const Customer = () => {
+  const { restaurants } = useRestaurant();
+
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -50,14 +50,6 @@ const Customer = () => {
   const handleFilter = useCallback((id) => setFilter(id), []);
 
   // Memoized filtered restaurants
-  // const filteredRestaurants = useMemo(() => {
-  //   return restaurants.filter(restro => {
-  //     const matchesSearch = restro.name.toLowerCase().includes(searchTerm.toLowerCase());
-  //     const matchesFilter = filter === 'all' ||
-  //       restro.cuisines.some(c => c.toLowerCase().includes(filter.toLowerCase()));
-  //     return matchesSearch && matchesFilter;
-  //   });
-  // }, [filter, searchTerm]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -107,29 +99,15 @@ const Customer = () => {
 
       <DealsMarque />
 
-      {/* Categories */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
-          {categories.map((cat) => (
-            <CategoryButton
-              key={cat.id}
-              cat={cat}
-              active={filter === cat.id}
-              onClick={handleFilter}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Restaurants Section */}
-      <div className="container mx-auto px-4 pb-16">
+      <div className="container mx-auto mt-20 px-4 pb-16">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
               Top Restaurants Near You
             </h2>
             <p className="text-gray-600">
-              {filteredRestaurants.length} restaurants found
+              {restaurants.length} restaurants found
             </p>
           </div>
           <button className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-lg hover:border-[#FFA31A] transition-colors">
@@ -138,22 +116,16 @@ const Customer = () => {
           </button>
         </div>
 
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredRestaurants.map((restro) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {restaurants?.map((restro) => (
             <RestroCard
-              key={restro.id}
-              image={restro.image}
-              name={restro.name}
-              address={restro.address}
-              rating={restro.rating}
-              deliveryTime={restro.deliveryTime}
-              cuisines={restro.cuisines}
-              promoted={restro.promoted}
+              key={restro._id}
+              restaurant={restro} // pass the whole object
             />
           ))}
-        </div> */}
+        </div>
 
-        {filteredRestaurants.length === 0 && (
+        {restaurants.length === 0 && (
           <div className="text-center py-16">
             <Search className="w-24 h-24 text-gray-300 mx-auto mb-4" />
             <h3 className="text-2xl font-semibold text-gray-700 mb-2">

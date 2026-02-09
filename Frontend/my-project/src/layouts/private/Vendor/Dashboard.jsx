@@ -8,12 +8,18 @@ import useAuth from "../../../hooks/use-auth.js";
 import { Link } from "react-router-dom";
 import useRoles from "../../../hooks/use-roles.js";
 const Dashboard = () => {
-  const { hasRoles, loggedInUser } = useAuth();
+  const { hasRoles, loggedInUser,logoutUser } = useAuth();
   const { activeRole } = useRoles();
   const formattedRole =
     activeRole?.role.charAt(0).toUpperCase() +
     activeRole?.role.slice(1) +
     ` (${activeRole?.name})`;
+
+  const handleLogout = () =>{
+    logoutUser()
+  }
+
+
   return (
     <div className="flex min-h-screen">
       <div className="p-[20px] bg-[#1C1C1C] flex lg:hidden justify-between absolute top-0 right-0 left-0">
@@ -107,9 +113,9 @@ const Dashboard = () => {
             {!hasRoles && (
               <ul className="flex flex-col gap-[10px] mt-[51px]">
                 <li className="text-[12px] leading-[100%] tracking-[0%] uppercase text-[#9B9B9B]">
-                  Pricing
+                  
                 </li>
-                <li className="flex hover:bg-[#F38030] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center rounded-[4px] curs">
+                <Link to={"manage-restaurant"}  className="flex hover:bg-[#F38030] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center rounded-[4px] curs">
                   <svg
                     width="16"
                     height="16"
@@ -123,8 +129,8 @@ const Dashboard = () => {
                     />
                   </svg>
                   Manage Restaurent
-                </li>
-                <li className="flex hover:bg-[#F38030] rounded-[4px] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center  curs">
+                </Link>
+                <Link to={"manage-orders"} className="flex hover:bg-[#F38030] rounded-[4px] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center  curs">
                   <svg
                     width="16"
                     height="16"
@@ -140,8 +146,8 @@ const Dashboard = () => {
                     />
                   </svg>
                   Orders
-                </li>
-                <li className="flex hover:bg-[#F38030] rounded-[4px] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center  curs">
+                </Link>
+                {/* <li className="flex hover:bg-[#F38030] rounded-[4px] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center  curs">
                   <svg
                     width="16"
                     height="16"
@@ -157,7 +163,7 @@ const Dashboard = () => {
                     />
                   </svg>
                   Sales
-                </li>
+                </li> */}
               </ul>
             )}
           </div>
@@ -199,7 +205,7 @@ const Dashboard = () => {
                 </svg>
                 Manage Restaurent
               </Link>
-              <li className="flex hover:bg-[#F38030] rounded-[4px] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center  curs">
+              <Link to={"manage-orders"} className="flex hover:bg-[#F38030] rounded-[4px] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center  curs">
                 <svg
                   width="16"
                   height="16"
@@ -215,7 +221,7 @@ const Dashboard = () => {
                   />
                 </svg>
                 Orders
-              </li>
+              </Link>
               <li className="flex hover:bg-[#F38030] rounded-[4px] gap-[8px] text-[#BCBCBC] text-[16px] leading-[100%] tracking-[0%] px-[14px] py-[12px] items-center  curs">
                 <svg
                   width="16"
@@ -339,7 +345,7 @@ const Dashboard = () => {
           </div>
         )}
 
-
+        <button onClick={handleLogout} className="mt-70 text-2xl text-gray-50 cursor-pointer">Logout</button>
       </div>
       <div className="p-[30px] pt-[100px] lg:pt-[30px]  w-full bg-[#f9f9f9]">
         <div className="flex justify-between">

@@ -89,7 +89,7 @@ export const rolesApi = createApi({
         } catch {
           // Rollback on failure
           if (previousRole) {
-            dispatch(setActiveRole(previousRole));
+            // dispatch(setActiveRole(previousRole));
           }
           // ✅ Error handled by axios interceptor
         }

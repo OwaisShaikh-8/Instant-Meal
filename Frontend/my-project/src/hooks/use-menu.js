@@ -8,25 +8,16 @@ import {
 } from "../services/menu-api";
 
 
-
-
-const useMenu = () => {
-  // 📦 restaurant state
-  
-  const {activeRestaurant} = useRestaurant({});
-
-  // 📦 menu state
+const useMenu = (id) => {
   const menuItems = useSelector((state) => state?.menu?.menuItems);
 
-  // 🚀 fetch menu (only when restaurant exists)
-  const {
-    isLoading,
-    isFetching,
-    error,
-    refetch,
-  } = useGetMenuByRestaurantQuery(undefined, {
-    skip: !activeRestaurant,
-  });
+  const { isLoading, isFetching, error, refetch } = useGetMenuByRestaurantQuery(
+    id,
+    {
+      skip: !id,
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   // mutations
   const [addMenuItem, addStatus] = useAddMenuItemMutation();
@@ -35,7 +26,6 @@ const useMenu = () => {
   return {
     // data
     menuItems,
-    activeRestaurant,
 
     // status
     isLoading,
@@ -45,9 +35,8 @@ const useMenu = () => {
     // actions
     addMenuItem,
     deleteMenuItem,
-    refetchMenu:refetch,
+    refetchMenu: refetch,
 
-    // mutation states (useful for UI)
     addStatus,
     deleteStatus,
   };

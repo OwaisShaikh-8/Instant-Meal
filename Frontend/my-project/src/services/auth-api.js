@@ -1,7 +1,7 @@
 // src/services/authApi.js
 import { createApi } from "@reduxjs/toolkit/query/react";
 import axiosBaseQuery from "./axios-base-query.js";
-import { setCredentials, logout } from "../redux/slice/auth-slice";
+import { setCredentials, logoutAction } from "../redux/slice/auth-slice";
 
 export const authApi = createApi({
   reducerPath: "authApi",
@@ -54,10 +54,10 @@ export const authApi = createApi({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled; // ✅ Wait for API response
-          dispatch(logout());
+          dispatch(logoutAction());
         } catch  {
           // ✅ Logout locally even if server fails (good UX)
-          dispatch(logout());
+          dispatch(logoutAction());
         }
       },
     }),

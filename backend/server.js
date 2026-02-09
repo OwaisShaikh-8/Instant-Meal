@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-
+import orderRoute from './routes/order-route.js'
 import userRoute from './routes/user.route.js';
 import rolesRoute from './routes/business-role-route.js';
 import restaurantRoutes from './routes/restaurant-route.js';
@@ -36,6 +36,7 @@ app.use('/api/auth', userRoute);
 app.use('/api/roles', rolesRoute);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/menu', menuRoute)
+app.use('/api/orders', orderRoute)
 
 // Error handling middleware (MUST be after routes)
 app.use((err, req, res, next) => {

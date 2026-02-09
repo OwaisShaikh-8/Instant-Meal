@@ -1,26 +1,30 @@
 import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   useCreateRestaurantMutation,
   useGetMyRestaurantQuery,
   useGetRestaurantsQuery,
   useGetRestaurantsByCityQuery,
+  useGetRestaurantByIdQuery, // 👈 NEW
 } from "../services/restaurant-api.js";
-import { useNavigate } from "react-router-dom";
-import { resetRestaurants } from "../redux/slice/restaurant-slice.js";
 
 const useRestaurant = ({
+  id = null, // 👈 NEW
   city = null,
   shouldFetchMyRestaurant = false,
   shouldFetchAllRestaurants = false,
   shouldFetchByCity = false,
+  shouldFetchById = false, // 👈 NEW
 } = {}) => {
-  const navigate = useNavigate();
 
-  // 📦 Redux state
+  // =====================
+  // 📦 Redux State
+  // =====================
+
   const activeRestaurant = useSelector(
     (state) => state.restaurants.activeRestaurant
   );
+
   const restaurants = useSelector(
     (state) => state.restaurants.restaurants
   );
@@ -56,6 +60,16 @@ const useRestaurant = ({
     skip: !shouldFetchByCity || !city,
   });
 
+  // ✅ NEW: Get Restaurant By ID
+  const {
+    isLoading: isRestaurantByIdLoading,
+    isError: isRestaurantByIdError,
+    error: restaurantByIdError,
+    refetch: refetchRestaurantById,
+  } = useGetRestaurantByIdQuery(id, {
+    skip: !shouldFetchById || !id,
+  });
+
   // =====================
   // 🔹 Mutations
   // =====================
@@ -75,19 +89,15 @@ const useRestaurant = ({
 
   const createNewRestaurant = useCallback(
     async (restaurantData) => {
-        console.log(restaurantData)
       try {
-        
         const response = await createRestaurant(restaurantData).unwrap();
-
-        
         return response;
       } catch (error) {
         console.error("Create restaurant failed:", error);
         throw error;
       }
     },
-    [createRestaurant, navigate]
+    [createRestaurant]
   );
 
   const fetchMyRestaurant = useCallback(async () => {
@@ -120,37 +130,54 @@ const useRestaurant = ({
     }
   }, [refetchCityRestaurants]);
 
+  // ✅ NEW: Fetch Restaurant By ID manually
+  const fetchRestaurantById = useCallback(async () => {
+    try {
+      const response = await refetchRestaurantById();
+      return response.data;
+    } catch (error) {
+      console.error("Fetch restaurant by ID failed:", error);
+      throw error;
+    }
+  }, [refetchRestaurantById]);
+
   // =====================
   // 📤 Return API
   // =====================
 
   return {
-    // State
+    // Redux State
     activeRestaurant,
     restaurants,
+
+    // Single Restaurant
 
     // Actions
     createNewRestaurant,
     fetchMyRestaurant,
     fetchAllRestaurants,
     fetchRestaurantsByCity,
+    fetchRestaurantById,
 
     // Loading states
     isMyRestaurantLoading,
     isRestaurantsLoading,
     isCityRestaurantsLoading,
+    isRestaurantByIdLoading,
     isCreateRestaurantLoading,
 
     // Error flags
     isMyRestaurantError,
     isRestaurantsError,
     isCityRestaurantsError,
+    isRestaurantByIdError,
     isCreateRestaurantError,
 
     // Error objects
     myRestaurantError,
     restaurantsError,
     cityRestaurantsError,
+    restaurantByIdError,
     createRestaurantError,
   };
 };

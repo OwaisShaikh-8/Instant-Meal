@@ -2,16 +2,21 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Menu, X, MapPin, User, Settings, LogOut, Search, ShoppingCart, Package, Home } from "lucide-react";
 import Avatar from "react-avatar";
 import useAuth from "../hooks/use-auth";
+import { useSelector,useDispatch } from "react-redux";
 import useRestaurant from "../hooks/use-restaurant";
-
+import { Link } from "react-router-dom";
+import { setCity } from "../redux/slice/extra-slice";
+import logo from "../assets/images/logo.png"
 
 
 
 const CustomerHeader = () => {
+  const dispatch = useDispatch();
+  const city = useSelector((state) => state.city.city);
   const [open, setOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [location, setLocation] = useState("sialkot");
+  const [location, setLocation] = useState(city);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartCount] = useState(3);
@@ -20,7 +25,7 @@ const CustomerHeader = () => {
   const profileRef = useRef(null);
   const searchRef = useRef(null);
 
-  const cityname = location.toLowerCase();
+  const cityname = location?.toLowerCase();
 
  const {restaurants,fetchRestaurantsByCity} = useRestaurant({city:cityname ,shouldFetchByCity:true })
 
@@ -62,8 +67,8 @@ const CustomerHeader = () => {
 
   const {logoutUser, isLogoutLoading} = useAuth()
   const navItems = [
-    { icon: Home, label: "Home", path: "/" },
-    { icon: Package, label: "Your Orders", path: "/orders" },
+    { icon: Home, label: "Home", path: "/customerhome" },
+    { icon: Package, label: "Your Orders", path: "/yourorder" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
 
@@ -75,7 +80,8 @@ const CustomerHeader = () => {
           <div className="flex justify-between items-center py-3">
             {/* Left side - Brand */}
             <div className="hidden md:flex items-center gap-2">
-              <div className="text-[#FFA31A] font-bold text-xl">🍔 FoodHub</div>
+              <img src={logo} alt="" className="h-10" />
+              {/* <div className="text-[#FFA31A] font-bold text-xl">🍔 FoodHub</div> */}
             </div>
 
             {/* Right side - Location & Profile */}
@@ -109,6 +115,7 @@ const CustomerHeader = () => {
                           key={city}
                           onClick={() => {
                             setLocation(city);
+                            dispatch(setCity(city))
                             setLocationOpen(false);
                           }}
                           className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors"
@@ -288,13 +295,13 @@ const CustomerHeader = () => {
                 const IconComponent = item.icon;
                 return (
                   <li key={item.label}>
-                    <a
-                      href={item.path}
+                    <Link
+                      to={item.path}
                       className="flex items-center gap-3 px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-lg transition-colors"
                     >
                       <IconComponent className="w-5 h-5 text-[#FFA31A]" />
                       <span>{item.label}</span>
-                    </a>
+                    </Link>
                   </li>
                 );
               })}

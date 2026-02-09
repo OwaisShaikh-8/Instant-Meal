@@ -1,8 +1,9 @@
 import React, { memo } from "react";
 import { MapPin, Phone, Mail } from "lucide-react";
-
+import { replace, useNavigate } from "react-router-dom";
 const RestroCard = memo(({ restaurant }) => {
   const {
+    _id,
     name,
     address,
     city,
@@ -11,9 +12,11 @@ const RestroCard = memo(({ restaurant }) => {
     banner,
     description,
   } = restaurant;
-
+  const navigate = useNavigate();
   return (
-    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer">
+    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer"
+    onClick={() => navigate(`/restaurants/${_id}`)}
+    >
       {/* Banner */}
       <div className="relative h-48 overflow-hidden">
         <img

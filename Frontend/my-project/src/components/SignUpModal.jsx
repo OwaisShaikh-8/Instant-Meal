@@ -83,7 +83,7 @@ const SignUpModal = ({ isOpen, setIsOpen, openLoginModal }) => {
                 : "text-gray-500"
             }`}
           >
-            User
+            Customer
           </button>
           <button
             type="button"

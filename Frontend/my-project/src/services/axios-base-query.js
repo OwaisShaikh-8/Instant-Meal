@@ -9,6 +9,7 @@ const axiosBaseQuery =
         method,
         data,
         params,
+        // headers: headers || {},
       });
 
       return { data: result.data };

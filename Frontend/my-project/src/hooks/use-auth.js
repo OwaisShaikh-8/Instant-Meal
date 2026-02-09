@@ -3,13 +3,19 @@ import {
   useLogoutMutation,
   useSignupMutation
 } from "../services/auth-api.js"; // ✅ Import hooks directly
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useCallback } from "react";
-
+import { resetMenu } from "../redux/slice/menu-slice.js";
+import { resetOrders } from "../redux/slice/order-slice.js";
+import { resetRoles } from "../redux/slice/roles-slice.js";
+import { clearCart } from "../redux/slice/cart-slice.js";
+import { resetRestaurants } from "../redux/slice/restaurant-slice.js";
+import { logoutAction } from "../redux/slice/auth-slice.js";
 const useAuth = () => {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch()
   const loggedInUser = useSelector((state) => state.auth.user);
   const hasRoles = useSelector((state) => state.auth.hasRoles);
 
@@ -87,9 +93,15 @@ const useAuth = () => {
   const logoutUser = useCallback(async () => {
     try {
       await logout().unwrap();
-
+      dispatch(logoutAction())
+      dispatch(resetMenu())
+      dispatch(resetOrders())
+      dispatch(resetRoles())
+      dispatch(clearCart())
+      dispatch(resetRestaurants())
       // ✅ Clear localStorage
       localStorage.removeItem("instantmeal");
+
 
       // ✅ Navigate to home
       navigate("/", { replace: true });

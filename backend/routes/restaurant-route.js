@@ -24,7 +24,8 @@ router.get("/getmyrestaurant", protect, getMyRestaurant);
 router.get("/getrestaurantsbycity/:city", getRestaurantsByCity)
 // router.get("/", getAllRestaurants);
 // Get restaurant by userId (admin / public use-case)
-router.get("/user/:userId", getRestaurantByUserId);
+
+// router.get("/user/:userId", getRestaurantByUserId);
 
 // Get restaurant by restaurantId
 router.get("/:id", getRestaurantById);

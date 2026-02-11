@@ -1,56 +1,53 @@
 import axios from "axios";
 import { store } from "../redux/store";
-// import { logoutAction } from "../redux/slice/auth-slice";
 import toast from "react-hot-toast";
-// ✅ Create instance
+
+// ✅ Decide baseURL dynamically
+const BASE_URL =
+    ["http://localhost:5000/api", "https://serene-gentleness-production.up.railway.app/api"]
+
 const axiosInstance = axios.create({
-  baseURL: "https://serene-gentleness-production.up.railway.app/api/",
-  // baseURL: "http://localhost:4002/api/",
-  withCredentials: true,
+  baseURL: BASE_URL,
+  // ❌ withCredentials removed because you use Bearer token
 });
 
 // ✅ Request interceptor → attach token
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = store.getState().auth.token;
+    const token =
+      store.getState().auth.token || localStorage.getItem("token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// ✅ Response interceptor → success + error handling
+// ✅ Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
-    // 🌟 Only show success for mutations (not GET requests)
     const method = response.config.method?.toLowerCase();
-    const isMutation = ['post', 'put', 'patch', 'delete'].includes(method);
-    
+    const isMutation = ["post", "put", "patch", "delete"].includes(method);
+
     if (isMutation && response.data?.message) {
-        toast.success(`${response.data.message}`); // replace with toast
+      toast.success(response.data.message);
     }
+
     return response;
   },
   (error) => {
-    const status = error.response?.status;
     console.error("API Error:", error);
-    
-    // ✅ FIXED: Correct error path
+
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
       error.message ||
       "Something went wrong";
 
-    // ❌ Show error alert
-    toast.error(`${message}`);
-
-    // 🔐 Auto logout on auth errors
-    // if (status === 401 || status === 403) {
-    //   store.dispatch(logout());
-    // }
+    toast.error(message);
 
     return Promise.reject(error);
   }

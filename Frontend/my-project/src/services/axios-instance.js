@@ -2,16 +2,13 @@ import axios from "axios";
 import { store } from "../redux/store";
 import toast from "react-hot-toast";
 
-// ✅ Decide baseURL dynamically
-const BASE_URL =
-    ["http://localhost:5000/api", "https://serene-gentleness-production.up.railway.app/api"]
+
 
 const axiosInstance = axios.create({
-  baseURL: BASE_URL,
-  // ❌ withCredentials removed because you use Bearer token
+  // baseURL: "http://localhost:5000/api",
+  baseURL: "https://serene-gentleness-production.up.railway.app/api",
 });
 
-// ✅ Request interceptor → attach token
 axiosInstance.interceptors.request.use(
   (config) => {
     const token =

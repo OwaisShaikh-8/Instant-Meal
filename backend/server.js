@@ -17,11 +17,11 @@ dotenv.config();
 
 const app = express();
 
-const URL = ["https://instant-meal-red.vercel.app","http://localhost:5173"]
 
 // Middlewares
 app.use(cors({
-  origin: URL,
+  // origin: "http://localhost:5173",
+  origin: "https://instant-meal-red.vercel.app",
   credentials: true,
 }));
 
